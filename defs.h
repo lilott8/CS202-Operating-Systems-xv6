@@ -118,6 +118,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+// lab1-1
+struct proc*		getproc(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -179,8 +181,10 @@ void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 
-// syscount.c
+// callcount.c
 // lab1-1
-int							syscount(int);
+int							getcallcount(int);
+extern	int			callcountnum;
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

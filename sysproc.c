@@ -92,8 +92,22 @@ sys_uptime(void)
 
 // returns the number of syscalls a process has made
 // lab1-1
-int
-sys_syscount(int proc)
+	int
+sys_callcount(void)
 {
-	return -1;
+	int pid;
+	struct proc* p;
+
+	if(argint(0, &pid) < 0) {
+		return -1;
+	}
+
+	p = getproc(pid);
+
+	if (p != (void*)0) {
+		cprintf("%s has %d calls\n", p->name, p->callcount);
+		return p->callcount;
+	} else {
+		return -1;
+	}
 }

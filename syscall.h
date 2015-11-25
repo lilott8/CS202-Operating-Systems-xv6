@@ -21,4 +21,4 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 // lab1-1
-#define SYS_syscount	 22
+#define SYS_callcount	 22

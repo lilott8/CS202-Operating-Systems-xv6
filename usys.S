@@ -30,4 +30,4 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 // lab1-1
-SYSCALL(syscount)
+SYSCALL(callcount)
