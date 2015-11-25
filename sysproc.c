@@ -89,3 +89,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// returns the number of syscalls a process has made
+// lab1-1
+int
+sys_syscount(int proc)
+{
+	return -1;
+}
