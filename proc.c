@@ -550,6 +550,8 @@ procdump(void)
 
 // lab1-2
 // this returns a random number between 0 and num
+// This is a modified version of the LFSR alogrithm
+// found here: http://goo.gl/At4AIC
 int
 procrand(int max) {
 
