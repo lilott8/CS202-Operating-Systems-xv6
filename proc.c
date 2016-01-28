@@ -73,6 +73,8 @@ found:
   
   // lab1-2
   p->numtickets = SEED_TICKETS;
+  p->totaltickets = 0;
+  p->numexecuted = 0;
   return p;
 }
 
@@ -348,13 +350,18 @@ lottery(void)
       // lab1-2
       // check for our winner!
       if(winner <= atticket || atticket == pooltickets) {
+        // increment the number of times executed
+        p->numexecuted++;
         // decrement our tickets
         p->numtickets -= DECREMENT_TICKETS;
         // refresh the tickets
         if(p->numtickets == 0) {
           p->numtickets = SEED_TICKETS;
+          // for distribution purposes we must
+          // know how many tickets this has seen
+          // it's entire life
+          p->totaltickets += SEED_TICKETS;
         }
-        cprintf("Process: %d, %s is allowed to run!\n", p->pid, p->name);
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
