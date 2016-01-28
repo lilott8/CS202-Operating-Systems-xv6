@@ -298,6 +298,7 @@ scheduler(void)
   }
 }
 
+// lab1-2
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -310,9 +311,12 @@ void
 lottery(void)
 {
   struct proc *p;
-  
-  int winner = procrand(4);
+  // lab1-2
+  // winner tracks who's turn it is to execute
+  int winner = 0;
+  // total number of tickets in the pool
   int pooltickets = 0;
+  // what ticket range we are at
   int atticket = 0;
 
   cprintf("Using lottery scheduling...\n");
@@ -322,6 +326,8 @@ lottery(void)
     sti();
 
     acquire(&ptable.lock);
+    // lab1-2
+    // count the number of tickets the lottery system has to pull from
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
       if(p->state == RUNNABLE) {
         pooltickets += p->numtickets;
