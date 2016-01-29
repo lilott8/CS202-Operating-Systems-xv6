@@ -72,6 +72,8 @@ struct proc {
   int numexecuted;             // number of times the process has been executed
   // lab1-2
   int totaltickets;            // total number of tickets the prcoess has had
+  // lab1-2
+  unsigned long int exectime;  // total time executed 
 };
 
 // Process memory is laid out contiguously, low addresses first:

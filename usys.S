@@ -29,3 +29,7 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+// lab1-2
+SYSCALL(lottery)
+// lab1-2
+SYSCALL(modtickets)

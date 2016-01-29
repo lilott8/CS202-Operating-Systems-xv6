@@ -8,6 +8,7 @@ struct rtcdate;
 struct spinlock;
 struct stat;
 struct superblock;
+struct tstat;
 
 // bio.c
 void            binit(void);
@@ -120,7 +121,12 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+// lab1-2
 int             procrand(int);
+// lab1-2
+void            getdistribution(struct tstat*);
+// lab1-2
+int             modifytickets(int, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -159,6 +165,8 @@ void            idtinit(void);
 extern uint     ticks;
 void            tvinit(void);
 extern struct spinlock tickslock;
+// lab1-2
+int             gettime();
 
 // uart.c
 void            uartinit(void);

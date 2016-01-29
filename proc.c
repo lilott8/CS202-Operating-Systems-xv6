@@ -6,7 +6,9 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "lottery.h"
+#include "tickets.h"
+#include "limits.h"
+#include <sys/time.h>
 
 struct {
   struct spinlock lock;
@@ -21,7 +23,7 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-void
+  void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
@@ -32,7 +34,7 @@ pinit(void)
 // If found, change state to EMBRYO and initialize
 // state required to run in the kernel.
 // Otherwise return 0.
-static struct proc*
+  static struct proc*
 allocproc(void)
 {
   struct proc *p;
@@ -56,11 +58,11 @@ found:
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
-  
+
   // Leave room for trap frame.
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
-  
+
   // Set up new context to start executing at forkret,
   // which returns to trapret.
   sp -= 4;
@@ -70,22 +72,23 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-  
+
   // lab1-2
   p->numtickets = SEED_TICKETS;
-  p->totaltickets = 0;
+  p->totaltickets = SEED_TICKETS;
   p->numexecuted = 0;
+  p->exectime = 0;
   return p;
 }
 
 //PAGEBREAK: 32
 // Set up first user process.
-void
+  void
 userinit(void)
 {
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
-  
+
   p = allocproc();
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
@@ -109,11 +112,11 @@ userinit(void)
 
 // Grow current process's memory by n bytes.
 // Return 0 on success, -1 on failure.
-int
+  int
 growproc(int n)
 {
   uint sz;
-  
+
   sz = proc->sz;
   if(n > 0){
     if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
@@ -130,7 +133,7 @@ growproc(int n)
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
-int
+  int
 fork(void)
 {
   int i, pid;
@@ -160,21 +163,21 @@ fork(void)
   np->cwd = idup(proc->cwd);
 
   safestrcpy(np->name, proc->name, sizeof(proc->name));
- 
+
   pid = np->pid;
 
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;
   release(&ptable.lock);
-  
+
   return pid;
 }
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
-void
+  void
 exit(void)
 {
   struct proc *p;
@@ -218,7 +221,7 @@ exit(void)
 
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
-int
+  int
 wait(void)
 {
   struct proc *p;
@@ -267,7 +270,7 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
+  void
 scheduler(void)
 {
   struct proc *p;
@@ -309,7 +312,7 @@ scheduler(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
+  void
 lottery(void)
 {
   struct proc *p;
@@ -320,6 +323,8 @@ lottery(void)
   int pooltickets = 0;
   // what ticket range we are at
   int atticket = 0;
+  // start of execution time
+  uint start = 0;  
 
   cprintf("Using lottery scheduling...\n");
 
@@ -362,6 +367,8 @@ lottery(void)
           // it's entire life
           p->totaltickets += SEED_TICKETS;
         }
+        // lab1-2
+        start = ticks;
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
@@ -371,10 +378,15 @@ lottery(void)
         swtch(&cpu->scheduler, proc->context);
         switchkvm();
 
+        // lab1-2
+        p->exectime += ticks - start;
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         proc = 0;
       }
+      // lab1-2
+      // reset ticks;
+      start = 0;
     }
     release(&ptable.lock);
 
@@ -589,4 +601,39 @@ procrand(int max) {
   }
 
   return rand;
+}
+
+void
+getdistribution(struct tstat* dist)
+{
+  struct proc* p;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if(p->totaltickets != 0 && p->pid != 0) {  
+      cprintf("%s|%d|%d|%d|%d\n", p->name, p->pid, p->numexecuted,p->totaltickets,p->exectime);
+    }
+  }
+  release(&ptable.lock);
+}
+
+int modifytickets(int pid, int quantity) {
+  
+  struct proc* p;
+  int x = -1;
+
+  cprintf("looking for pid: %d\n", pid);
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
+    if(p->pid == pid) {
+      p->numtickets += quantity;
+      if(quantity > 0) {
+        p->totaltickets += quantity;
+      }
+      x = 1;
+    }
+  }
+  release(&ptable.lock);
+  return x;
 }

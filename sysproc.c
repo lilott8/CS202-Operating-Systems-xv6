@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "tickets.h"
 
 int
 sys_fork(void)
@@ -88,4 +89,42 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+// lab1-2
+int
+sys_lottery(void)
+{
+  struct tstat *dist[NPROC] = {};
+  
+  getdistribution(*dist);
+ 
+  cprintf("ticks: %d\n", sys_uptime());
+  //for(int x;x<NPROC;x++) {
+  //  cprintf("%s|%d|%d|%d\n", dist[x]->name, dist[x]->pid, dist[x]->totaltickets, dist[x]->numexecuted);
+  //}
+ 
+  return 0; 
+}
+
+// lab1-2
+int sys_modtickets(void)
+{
+  int pid;
+  int quantity;
+
+  if(argint(0, &pid) < 0) {
+    return -1;
+  }
+  
+  // if we cannot read the quantity, add the default
+  argint(INCREMENT_TICKETS, &quantity);
+  
+  quantity = SUPER_ADD;
+
+  if(modifytickets(pid, quantity) != -1) {
+    return 1;
+  } else {
+    return -1;
+  }
 }
