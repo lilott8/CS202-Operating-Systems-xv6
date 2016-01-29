@@ -174,6 +174,7 @@ UPROGS=\
 	_zombie\
   _lottery\
   _modtickets\
+  _fb\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
