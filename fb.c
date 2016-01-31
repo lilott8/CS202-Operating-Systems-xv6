@@ -4,6 +4,8 @@
 
 #define MAX_FORKS 10
 
+// lab1-2
+
 int
 main(int argc, char *argv[]) {
   printf(2, "Running forkbomb\n");
