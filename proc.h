@@ -1,6 +1,8 @@
 // Segments in proc->gdt.
 #define NSEGS     7
-
+// lab1-2
+// do we modify tickets awarded to processe in lottery
+#define MOD_TICKETS 0
 // Per-CPU state
 struct cpu {
   uchar id;                    // Local APIC ID; index into cpus[] below

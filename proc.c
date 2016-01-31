@@ -358,14 +358,16 @@ lottery(void)
         // increment the number of times executed
         p->numexecuted++;
         // decrement our tickets
-        p->numtickets -= DECREMENT_TICKETS;
-        // refresh the tickets
-        if(p->numtickets == 0) {
-          p->numtickets = SEED_TICKETS;
-          // for distribution purposes we must
-          // know how many tickets this has seen
-          // it's entire life
-          p->totaltickets += SEED_TICKETS;
+        if(MOD_TICKETS) {
+          p->numtickets -= DECREMENT_TICKETS;
+          // refresh the tickets
+          if(p->numtickets == 0) {
+            p->numtickets = SEED_TICKETS;
+            // for distribution purposes we must
+            // know how many tickets this has seen
+            // it's entire life
+            p->totaltickets += SEED_TICKETS;
+          }
         }
         // lab1-2
         start = ticks;
@@ -603,7 +605,7 @@ procrand(int max) {
   return rand;
 }
 
-void
+  void
 getdistribution(struct tstat* dist)
 {
   struct proc* p;
@@ -611,14 +613,14 @@ getdistribution(struct tstat* dist)
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
     if(p->totaltickets != 0 && p->pid != 0) {  
-      cprintf("%s|%d|%d|%d|%d\n", p->name, p->pid, p->numexecuted,p->totaltickets,p->exectime);
+      cprintf("Name: %s\tPID: %d\tExecs: %d\tTickets: %d\tTime: %d\n", p->name, p->pid, p->numexecuted,p->totaltickets,p->exectime);
     }
   }
   release(&ptable.lock);
 }
 
 int modifytickets(int pid, int quantity) {
-  
+
   struct proc* p;
   int x = -1;
 
