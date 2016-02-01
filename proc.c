@@ -385,10 +385,11 @@ lottery(void)
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         proc = 0;
-        // lab1-2
-        // increment the atticket
-        atticket += p->numtickets;
       }
+      // lab1-2
+      // increment the atticket
+      atticket += p->numtickets;
+      
       // lab1-2
       // reset ticks;
       start = 0;
