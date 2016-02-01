@@ -14,7 +14,12 @@ main(int argc, char *argv[]) {
 
   for(int x = 0; x <  MAX_FORKS; x++) {
     pid = fork();
-    if(pid < 0) {}
+    if(pid < 0) {printf(2,"Error: fork failed\n");}
+    while(1){
+      if(pid % 2 ==0) {
+        //sleep(4);
+      }
+    }
   }
 
   exit();

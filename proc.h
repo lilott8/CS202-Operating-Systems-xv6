@@ -69,11 +69,11 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   // lab1-2
-  int numtickets;              // number of tickets a process has
+  uint numtickets;              // number of tickets a process has
   // lab1-2
-  int numexecuted;             // number of times the process has been executed
+  uint numexecuted;             // number of times the process has been executed
   // lab1-2
-  int totaltickets;            // total number of tickets the prcoess has had
+  uint totaltickets;            // total number of tickets the prcoess has had
   // lab1-2
   unsigned long int exectime;  // total time executed 
 };

@@ -322,7 +322,7 @@ lottery(void)
   // total number of tickets in the pool
   int pooltickets = 0;
   // what ticket range we are at
-  int atticket = 0;
+  uint atticket = 0;
   // start of execution time
   uint start = 0;
 
@@ -385,6 +385,9 @@ lottery(void)
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         proc = 0;
+        // lab1-2
+        // increment the atticket
+        atticket += p->numtickets;
       }
       // lab1-2
       // reset ticks;
