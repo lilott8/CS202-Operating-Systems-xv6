@@ -173,7 +173,7 @@ UPROGS=\
 	_wc\
 	_zombie\
   _lottery\
-  _modtickets\
+  _mt\
   _fb\
 
 fs.img: mkfs README $(UPROGS)

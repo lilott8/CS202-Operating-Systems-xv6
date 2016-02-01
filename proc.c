@@ -324,7 +324,7 @@ lottery(void)
   // what ticket range we are at
   int atticket = 0;
   // start of execution time
-  uint start = 0;  
+  uint start = 0;
 
   cprintf("Using lottery scheduling...\n");
 

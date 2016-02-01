@@ -118,9 +118,10 @@ int sys_modtickets(void)
   }
   
   // if we cannot read the quantity, add the default
-  argint(INCREMENT_TICKETS, &quantity);
-  
-  quantity = SUPER_ADD;
+  argint(1, &quantity);
+  if(quantity < 0) {
+    quantity = SUPER_ADD;
+  }
 
   if(modifytickets(pid, quantity) != -1) {
     return 1;
