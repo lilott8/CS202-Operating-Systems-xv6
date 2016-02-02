@@ -128,6 +128,7 @@ int sys_modtickets(void)
   } else {
     return -1;
   }
+}
 
 // returns the number of syscalls a process has made
 // lab1-1
