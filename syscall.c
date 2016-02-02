@@ -101,16 +101,13 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-<<<<<<< HEAD
 // lab1-2
 extern int sys_lottery(void);
 // lab1-2
 extern int sys_modtickets(void);
-=======
 // externing the callcount call
 // lab1-1
 extern int sys_callcount(void);
->>>>>>> master
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -134,14 +131,11 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-<<<<<<< HEAD
 // lab1-2
 [SYS_lottery] sys_lottery,
 [SYS_modtickets]  sys_modtickets,
-=======
 	// lab1-1
 [SYS_callcount]	sys_callcount,
->>>>>>> master
 };
 
 void

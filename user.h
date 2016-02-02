@@ -23,15 +23,12 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-<<<<<<< HEAD
 // lab1-2
 int lottery(void);
 // lab1-2
 int modtickets(int, int);
-=======
 // lab1-1
 int callcount(int);
->>>>>>> master
 
 // ulib.c
 int stat(char*, struct stat*);

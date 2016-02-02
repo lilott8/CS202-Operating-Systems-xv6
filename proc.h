@@ -68,7 +68,6 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-<<<<<<< HEAD
   // lab1-2
   uint numtickets;              // number of tickets a process has
   // lab1-2
@@ -77,10 +76,8 @@ struct proc {
   uint totaltickets;            // total number of tickets the prcoess has had
   // lab1-2
   unsigned long int exectime;  // total time executed 
-=======
 	// lab1-1
 	int callcount; 	 						 // count of everytime a syscall is issued
->>>>>>> master
 };
 
 // Process memory is laid out contiguously, low addresses first:

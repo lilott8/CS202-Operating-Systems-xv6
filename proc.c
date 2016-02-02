@@ -574,7 +574,6 @@ procdump(void)
   }
 }
 
-<<<<<<< HEAD
 // lab1-2
 // this returns a random number between 0 and num
 // This is a modified version of the LFSR alogrithm
@@ -644,7 +643,7 @@ int modifytickets(int pid, int quantity) {
   }
   release(&ptable.lock);
   return x;
-=======
+
 // lab1-1
 // this searches the proctable for the pid provided
 struct proc*
@@ -664,5 +663,4 @@ getproc(int pid) {
 	release(&ptable.lock);
 
 	return proc;
->>>>>>> master
 }

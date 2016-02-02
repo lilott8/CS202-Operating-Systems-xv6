@@ -91,7 +91,6 @@ sys_uptime(void)
   return xticks;
 }
 
-<<<<<<< HEAD
 // lab1-2
 int
 sys_lottery(void)
@@ -129,7 +128,7 @@ int sys_modtickets(void)
   } else {
     return -1;
   }
-=======
+
 // returns the number of syscalls a process has made
 // lab1-1
 	int
@@ -150,5 +149,4 @@ sys_callcount(void)
 	} else {
 		return -1;
 	}
->>>>>>> master
 }

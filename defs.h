@@ -121,17 +121,14 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-<<<<<<< HEAD
 // lab1-2
 int             procrand(int);
 // lab1-2
 void            getdistribution(struct tstat*);
 // lab1-2
 int             modifytickets(int, int);
-=======
 // lab1-1
 struct proc*		getproc(int);
->>>>>>> master
 
 // swtch.S
 void            swtch(struct context**, struct context*);
