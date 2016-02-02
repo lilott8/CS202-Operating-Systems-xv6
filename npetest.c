@@ -15,7 +15,7 @@ main(int argc, char *argv[])
   printf(2, "Testing valid data\n");
   printf(2, "a is: %d\n", a);
   printf(2, "Testing for NPE now...\n");
-  printf(2, "p is: %d\n", &p);
+  printf(2, "p is: %d\n", *p);
   printf(2, "NPE passed\n");
 
   exit();
