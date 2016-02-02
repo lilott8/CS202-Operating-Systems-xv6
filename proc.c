@@ -643,6 +643,7 @@ int modifytickets(int pid, int quantity) {
   }
   release(&ptable.lock);
   return x;
+}
 
 // lab1-1
 // this searches the proctable for the pid provided
