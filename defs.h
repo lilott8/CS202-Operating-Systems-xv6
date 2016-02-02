@@ -121,12 +121,17 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+<<<<<<< HEAD
 // lab1-2
 int             procrand(int);
 // lab1-2
 void            getdistribution(struct tstat*);
 // lab1-2
 int             modifytickets(int, int);
+=======
+// lab1-1
+struct proc*		getproc(int);
+>>>>>>> master
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -189,6 +194,11 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+
+// callcount.c
+// lab1-1
+int							getcallcount(int);
+extern	int			callcountnum;
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

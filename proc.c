@@ -106,8 +106,9 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
-
   p->state = RUNNABLE;
+	// lab1-1
+	p->callcount = 0;
 }
 
 // Grow current process's memory by n bytes.
@@ -573,6 +574,7 @@ procdump(void)
   }
 }
 
+<<<<<<< HEAD
 // lab1-2
 // this returns a random number between 0 and num
 // This is a modified version of the LFSR alogrithm
@@ -642,4 +644,25 @@ int modifytickets(int pid, int quantity) {
   }
   release(&ptable.lock);
   return x;
+=======
+// lab1-1
+// this searches the proctable for the pid provided
+struct proc*
+getproc(int pid) {
+	// found process
+	struct proc* proc = (void*)0;
+	// iterator process
+	struct proc* p;
+
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+		if(p->pid == pid) {
+			proc = p;
+			break;
+		}
+	}
+	release(&ptable.lock);
+
+	return proc;
+>>>>>>> master
 }

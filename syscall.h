@@ -20,7 +20,12 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+<<<<<<< HEAD
 // lab1-2
 #define SYS_lottery 22
 // lab1-2
 #define SYS_modtickets 23
+=======
+// lab1-1
+#define SYS_callcount	 22
+>>>>>>> master

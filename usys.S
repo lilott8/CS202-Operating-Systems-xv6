@@ -29,7 +29,12 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+<<<<<<< HEAD
 // lab1-2
 SYSCALL(lottery)
 // lab1-2
 SYSCALL(modtickets)
+=======
+// lab1-1
+SYSCALL(callcount)
+>>>>>>> master

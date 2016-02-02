@@ -175,6 +175,7 @@ UPROGS=\
   _lottery\
   _mt\
   _fb\
+	_callcount\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
