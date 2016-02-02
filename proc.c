@@ -352,7 +352,9 @@ lottery(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
+      // lab1-2
+      // increment the atticket
+      atticket += p->numtickets;
       // lab1-2
       // check for our winner!
       if(winner <= atticket || atticket == pooltickets) {
@@ -387,10 +389,6 @@ lottery(void)
         // It should have changed its p->state before coming back.
         proc = 0;
       }
-      // lab1-2
-      // increment the atticket
-      atticket += p->numtickets;
-      
       // lab1-2
       // reset ticks;
       start = 0;
