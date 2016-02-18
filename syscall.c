@@ -17,8 +17,15 @@
 int
 fetchint(uint addr, int *ip)
 {
+  //cprintf("pid: %d\n", proc->pid);
   if(addr >= proc->sz || addr+4 > proc->sz)
     return -1;
+  
+  if(addr == 0) {
+    cprintf("Address is %d\n", addr);
+    return -1;
+  }
+
   *ip = *(int*)(addr);
   return 0;
 }
@@ -30,9 +37,17 @@ int
 fetchstr(uint addr, char **pp)
 {
   char *s, *ep;
+  //cprintf("pid: %d\n", proc->pid);
 
   if(addr >= proc->sz)
     return -1;
+
+  // lab2
+  if(addr == 0) {
+    cprintf("Address is %d\n", addr);
+    return -1;
+  }
+
   *pp = (char*)addr;
   ep = (char*)proc->sz;
   for(s = *pp; s < ep; s++)
@@ -60,6 +75,11 @@ argptr(int n, char **pp, int size)
     return -1;
   if((uint)i >= proc->sz || (uint)i+size > proc->sz)
     return -1;
+  // lab2
+  if((uint) i == 0) {
+    cprintf("Argptr has a pointer with address of: %d\n", (uint) i);
+    return -1;
+  }
   *pp = (char*)i;
   return 0;
 }
