@@ -17,12 +17,12 @@
 int
 fetchint(uint addr, int *ip)
 {
-  //cprintf("pid: %d\n", proc->pid);
   if(addr >= proc->sz || addr+4 > proc->sz)
     return -1;
   
+  // Lab2
+  // if the address is a null pointer 
   if(addr == 0) {
-    cprintf("Address is %d\n", addr);
     return -1;
   }
 
@@ -42,9 +42,9 @@ fetchstr(uint addr, char **pp)
   if(addr >= proc->sz)
     return -1;
 
-  // lab2
+  // Lab2
+  // if the address is a null pointer 
   if(addr == 0) {
-    cprintf("Address is %d\n", addr);
     return -1;
   }
 
@@ -75,9 +75,10 @@ argptr(int n, char **pp, int size)
     return -1;
   if((uint)i >= proc->sz || (uint)i+size > proc->sz)
     return -1;
-  // lab2
-  if((uint) i == 0) {
-    cprintf("Argptr has a pointer with address of: %d\n", (uint) i);
+  
+  // Lab2
+  // if the address is a null pointer 
+  if((uint)i == 0) {
     return -1;
   }
   *pp = (char*)i;

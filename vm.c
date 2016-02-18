@@ -318,7 +318,6 @@ copyuvm(pde_t *pgdir, uint sz)
     return 0;
   // lab2
   // original i=0
-  // proposed change: i=pgsize
   for(i = PGSIZE; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");

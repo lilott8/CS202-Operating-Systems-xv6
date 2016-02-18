@@ -38,7 +38,6 @@ exec(char *path, char **argv)
   // Load program into memory.
   // lab2
   // original: sz=0;
-  // proposed: sz=PGSIZE-1;
   sz = PGSIZE;
 
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
