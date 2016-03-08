@@ -464,3 +464,56 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int clone(void(*start)(void*), void* args, void* stack) {
+  
+  int i, pid;
+  struct proc *np;
+  int * ustack = stack + PGSIZE - 4;  
+  //cprintf("ustack %p\n", ustack);
+
+  // Allocate process. KEEP THIS, gives kernel stack
+  if((np = allocproc()) == 0)
+    return -1;
+
+  np->pgdir = proc->pgdir;
+  np->sz = proc->sz;
+  //np->pthread = proc;
+  //np->ustack = stack;
+  // not sure about this
+  np->parent = 0;
+  *np->tf = *proc->tf; // Change new child's tf
+
+  // Clone may need to change other registers than ones seen in fork
+  // New threads have new pids or thread ids
+  //
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->eax = np->pid;
+  np->tf->ebp = (int) ustack - 4;
+  np->tf->esp = (int) ustack - 4;
+  np->tf->eip = (int) start; 
+  // setup new user stack and some pointers
+  // np->tf->eip np->tf->eip
+  *ustack = (int) args; // 7
+  //*(ustack - 1) = (int) (arg + 4); // 3
+  //*(ustack - 2) = (int) arg; // 5
+  *(ustack - 1) = 0xffffffff; // bs return addr
+  *(ustack - 2) = 0xffffffff; // bs ebp
+
+  for(i = 0; i < NOFILE; i++) {
+    if(proc->ofile[i]) {
+      np->ofile[i] = filedup(proc->ofile[i]);
+    }
+  }
+  np->cwd = idup(proc->cwd);
+
+  pid = np->pid;
+  np->state = RUNNABLE;
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
+
+  return pid;
+}
+
+int join(void** stack) {
+return 1;
+}

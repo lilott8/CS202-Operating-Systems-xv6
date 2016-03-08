@@ -89,3 +89,37 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// lab3
+int sys_clone(void) {
+  void* start = 0;
+  void* stack = 0;
+  void* args = 0;
+
+  if(argint(0, (int *) &start) < 0) {
+    cprintf("Error, no starting function.\n");
+    return -1;
+  }
+
+  if(argint(1, (int *) &args) < 0) {
+    cprintf("Error, no args provided.\n");
+    return -1;
+  }
+
+  if(argint(2, (int *) &stack) < 0) {
+    cprintf("Error, stack is unitialized.\n");
+    return -1;
+  }
+
+  return clone(start, args, stack);
+
+}
+
+int sys_join(void) {
+  void ** stack = 0;
+
+  if(argint(0, (int *) &stack) < 0)
+    return -1;
+
+  return join(stack);
+}
