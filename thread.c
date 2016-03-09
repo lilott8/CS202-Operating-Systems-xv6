@@ -8,12 +8,12 @@
 /**
  * Lab3
  */
-struct tinfo lock;
+struct lock_t lock;
 
 /**
  * Initialize our thread lock variable
  */
-void tinit(struct tinfo *locked) {
+void tinit(struct lock_t *locked) {
   locked->lock_hold = 0;
 }
 
@@ -25,19 +25,19 @@ void tinit(struct tinfo *locked) {
  */
 int thread_create(void*(*start) (void*), void *arg) {
   // allocate the stack frame with malloc
-  void *stack = malloc(PGSIZE*2);
+  void *stack = malloc(PGSIZE/2);
   // clone the process using our new stack
   // as the address space for the thread
   // clone is function start, args, stack
   int thread = clone(start, arg, stack);
 
-  printf(2, "starting thread: %d\n", thread);
+   printf(2, "Starting thread: %d\n", thread);
 
   // make sure we properly cloned
   // process before we start execution
   if(!thread) {
     // execute starting here!
-    //(*start)(arg);
+    (*start)(arg);
     //printf(2, "Done executing\n");
   }
   return thread;
@@ -57,11 +57,11 @@ void thread_join() {
  * but leverage the simplicity of XV6
  * to handle the complexity.
  */
-void init_lock(struct tinfo *locked) {
-  //locked->lock_hold = 0;
+void init_lock(struct lock_t *locked) {
+  locked->lock_hold = 0;
 }
 
-void lock_acquire(struct tinfo *locked) {
+void lock_acquire(struct lock_t *locked) {
   // unfortunately, user.h and defs.h
   // have conflicting definitions of 
   // certain methods and are mutually
@@ -72,7 +72,7 @@ void lock_acquire(struct tinfo *locked) {
     ;
 }
 
-void lock_release(struct tinfo *locked) {
+void lock_release(struct lock_t *locked) {
   // please see note in "lock_acquire"
   xchg(&locked->lock_hold, 0);
 }

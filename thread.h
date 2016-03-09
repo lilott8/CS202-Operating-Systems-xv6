@@ -3,6 +3,6 @@
  */
 
 // container for our lock
-struct tinfo {
+struct lock_t {
   uint lock_hold;
 };

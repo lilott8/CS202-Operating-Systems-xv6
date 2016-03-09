@@ -242,8 +242,8 @@ wait(void)
     havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       // lab3
-      if(p->parent != proc || p->thread == 1)
-        continue;
+      if(p->parent != proc)
+        //continue;
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
@@ -495,7 +495,7 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   struct proc *np;
   // this will point to the top of our stack
   // thus it will be the higher address
-  int *stack_top = stack + PGSIZE;
+  //int *stack_top = stack + PGSIZE;
 
   // Allocate process or die trying!
   if((np = allocproc()) == 0)
@@ -514,15 +514,26 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
   // set the args on the stack to the args we want
-  *(uint*)(stack_top - 4) = (int) args;
+  //*(uint*)(stack_top - 4) = (int) args;
   // we don't care what the return address is
-  *(uint*)(stack_top - 8) = 0;
+  //*(uint*)(stack_top - 8) = 0;
   // register values are different for the new clone
   // so we need to ensure that each register is 
   // pointing to the correct value otherwise it dies
-  np->tf->esp = (int) (stack_top - 8);
+  //np->tf->esp = (int) (stack_top - 8);
   // now point the EIP to the starting function
-  np->tf->eip = (int) start;
+  //np->tf->eip = (int) start;
+
+  void *startloc = (void *)proc->tf->ebp + 16;  // 16 moves it up 16 bytes (4 locations)
+  void *endloc = (void *)proc->tf->esp;
+  uint stacksize = (uint) (startloc - endloc);
+
+  np->tf->esp = (uint)(stack - stacksize);
+  np->tf->ebp = (uint)(stack - 16);
+
+  memmove(stack - stacksize, endloc, stacksize);
+
+
 
   // denote this as a thread
   np->thread = 1;

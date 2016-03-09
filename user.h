@@ -1,7 +1,7 @@
 struct stat;
 struct rtcdate;
 // lab3
-struct tinfo;
+struct lock_t;
 
 // system calls
 int fork(void);
@@ -44,9 +44,9 @@ void free(void*);
 int atoi(const char*);
 
 // lab3
-void tinit(struct tinfo *lock);
+void tinit(struct lock_t *lock);
 int thread_create(void*(*start)(void*), void *arg);
 void thread_join();
-void init_lock(struct tinfo *lock);
-void lock_acquire(struct tinfo *lock);
-void lock_release(struct tinfo *lock);
+void init_lock(struct lock_t *lock);
+void lock_acquire(struct lock_t *lock);
+void lock_release(struct lock_t *lock);
