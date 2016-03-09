@@ -118,6 +118,18 @@ growproc(int n)
       return -1;
   }
   proc->sz = sz;
+  // lab3
+  // we must ensure that threads can request growth
+  // as well, otherwise things break, and xv6 starts
+  // on fire
+  struct proc *p;
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if(p->parent != proc || p->thread == 1) {
+      p->sz = sz;
+    }
+  }
+  release(&ptable.lock); 
   switchuvm(proc);
   return 0;
 }
@@ -125,7 +137,7 @@ growproc(int n)
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
-int
+  int
 fork(void)
 {
   int i, pid;
@@ -155,21 +167,24 @@ fork(void)
   np->cwd = idup(proc->cwd);
 
   safestrcpy(np->name, proc->name, sizeof(proc->name));
- 
+
   pid = np->pid;
+
+  // lab3
+  np->thread = 0;
 
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;
   release(&ptable.lock);
-  
+
   return pid;
 }
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
-void
+  void
 exit(void)
 {
   struct proc *p;
@@ -213,7 +228,7 @@ exit(void)
 
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
-int
+  int
 wait(void)
 {
   struct proc *p;
@@ -224,7 +239,8 @@ wait(void)
     // Scan through table looking for zombie children.
     havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->parent != proc)
+      // lab3
+      if(p->parent != proc || p->thread == 1)
         continue;
       havekids = 1;
       if(p->state == ZOMBIE){
@@ -232,12 +248,18 @@ wait(void)
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
-        freevm(p->pgdir);
+        // lab3
+        // only free the vm if the process is done
+        if(p->thread != 1) {
+          freevm(p->pgdir);
+        }
         p->state = UNUSED;
         p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        // lab3
+        p->thread = 0;
         release(&ptable.lock);
         return pid;
       }
@@ -262,7 +284,7 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
+  void
 scheduler(void)
 {
   struct proc *p;
@@ -297,7 +319,7 @@ scheduler(void)
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state.
-void
+  void
 sched(void)
 {
   int intena;
@@ -316,7 +338,7 @@ sched(void)
 }
 
 // Give up the CPU for one scheduling round.
-void
+  void
 yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
@@ -327,7 +349,7 @@ yield(void)
 
 // A fork child's very first scheduling by scheduler()
 // will swtch here.  "Return" to user space.
-void
+  void
 forkret(void)
 {
   static int first = 1;
@@ -342,13 +364,13 @@ forkret(void)
     iinit(ROOTDEV);
     initlog(ROOTDEV);
   }
-  
+
   // Return to "caller", actually trapret (see allocproc).
 }
 
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
-void
+  void
 sleep(void *chan, struct spinlock *lk)
 {
   if(proc == 0)
@@ -386,7 +408,7 @@ sleep(void *chan, struct spinlock *lk)
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
 // The ptable lock must be held.
-static void
+  static void
 wakeup1(void *chan)
 {
   struct proc *p;
@@ -397,7 +419,7 @@ wakeup1(void *chan)
 }
 
 // Wake up all processes sleeping on chan.
-void
+  void
 wakeup(void *chan)
 {
   acquire(&ptable.lock);
@@ -408,7 +430,7 @@ wakeup(void *chan)
 // Kill the process with the given pid.
 // Process won't exit until it returns
 // to user space (see trap in trap.c).
-int
+  int
 kill(int pid)
 {
   struct proc *p;
@@ -432,22 +454,22 @@ kill(int pid)
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.
-void
+  void
 procdump(void)
 {
   static char *states[] = {
-  [UNUSED]    "unused",
-  [EMBRYO]    "embryo",
-  [SLEEPING]  "sleep ",
-  [RUNNABLE]  "runble",
-  [RUNNING]   "run   ",
-  [ZOMBIE]    "zombie"
+    [UNUSED]    "unused",
+    [EMBRYO]    "embryo",
+      [SLEEPING]  "sleep ",
+        [RUNNABLE]  "runble",
+          [RUNNING]   "run   ",
+            [ZOMBIE]    "zombie"
   };
   int i;
   struct proc *p;
   char *state;
   uint pc[10];
-  
+
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->state == UNUSED)
       continue;
@@ -466,10 +488,12 @@ procdump(void)
 }
 
 int clone(void*(*start)(void*), void* args, void* stack) {
-  
+
   int i, pid;
   struct proc *np;
-  int * ustack = stack + PGSIZE - 4;  
+  // this will point to the top of our stack
+  // thus it will be the higher address
+  int *stack_top = stack + PGSIZE;
 
   // Allocate process or die trying!
   if((np = allocproc()) == 0)
@@ -480,28 +504,30 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   // parent thread
   np->pgdir = proc->pgdir;
   np->sz = proc->sz;
-  //np->pthread = proc;
-  //np->ustack = stack;
   // not sure about this
-  np->parent = 0;
+  np->parent = proc;
   // point the trap frame of the child
   // to that of the parent
   *np->tf = *proc->tf;
   // Clear %eax so that fork returns 0 in the child.
-  np->tf->eax = np->pid;
+  np->tf->eax = 0;
+  // set the args on the stack to the args we want
+  *(uint*)(stack_top - 4) = (int) args;
+  // we don't care what the return address is
+  *(uint*)(stack_top - 8) = 0xffffffff;
   // register values are different for the new clone
   // so we need to ensure that each register is 
   // pointing to the correct value otherwise it dies
-  np->tf->ebp = (int) ustack - 4;
-  np->tf->esp = (int) ustack - 4;
-  np->tf->eip = (int) start; 
-  // set the args on the stack to the args we want
-  *ustack = (int) args; // 7
-  // we don't care what the return address is
-  *(ustack - 1) = 0xffffffff;
-  // we don't care what the ebp is
-  *(ustack - 2) = 0xffffffff;
-  
+  np->tf->esp = (int) (stack_top - 8);
+  // now point the EIP to the starting function
+  np->tf->eip = (int) start;
+
+  // denote this as a thread
+  np->thread = 1;
+
+  // finally set the stack to the thread
+  // np->stack = stack;
+
   // copy the file descriptors
   for(i = 0; i < NOFILE; i++) {
     if(proc->ofile[i]) {
@@ -511,7 +537,7 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   np->cwd = idup(proc->cwd);
 
   pid = np->pid;
-  
+
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
 
@@ -519,5 +545,5 @@ int clone(void*(*start)(void*), void* args, void* stack) {
 }
 
 int join(void** stack) {
-return 1;
+  return 1;
 }

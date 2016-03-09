@@ -25,7 +25,7 @@ void tinit(struct tinfo *locked) {
  */
 void thread_create(void*(*start) (void*), void *arg) {
   // allocate the stack frame with malloc
-  void *stack = malloc(PGSIZE);
+  void *stack = malloc(PGSIZE*2);
   // clone the process using our new stack
   // as the address space for the thread
   // clone is function start, args, stack
@@ -40,7 +40,6 @@ void thread_create(void*(*start) (void*), void *arg) {
     (*start)(arg);
     // cleanly exit execution
     printf(2, "Done executing\n");
-    exit();
   }
 }
 
@@ -49,7 +48,7 @@ void thread_create(void*(*start) (void*), void *arg) {
  * before we progress
  */
 void thread_join() {
-  wait();
+  //wait();
 }
 /**
  * Wrappers for acquiring the atomic spin
