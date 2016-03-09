@@ -125,11 +125,13 @@ growproc(int n)
   struct proc *p;
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    // only allow growth for threads
     if(p->parent != proc || p->thread == 1) {
       p->sz = sz;
     }
   }
   release(&ptable.lock); 
+  
   switchuvm(proc);
   return 0;
 }

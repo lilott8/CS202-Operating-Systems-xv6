@@ -7,8 +7,8 @@
 #include "traps.h"
 
 
-void print537(char * five){
-  printf(1, "cs %s\n", *five);
+void frisbee(char * five){
+  printf(1, "printing: %s\n", *five);
   exit();
 }
 
@@ -23,7 +23,7 @@ main(int argc, char *argv[])
   printf(1, "testing...\n");
   // printf(1, "user printf stack %p, stack2 %p\n", stack, stack2);
 
-  pid = clone((void *) &print537, (void *) &arg, (void *) *stack);
+  pid = clone((void *) &frisbee, (void *) &arg, (void *) *stack);
   printf(1, "user pid: %d\n", pid);
 
   //printf(1, "jpid %d\n", join((void **) stack));
