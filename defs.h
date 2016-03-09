@@ -119,7 +119,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 // lab3
-int             clone(void*(*start)(void*), void*, void*);
+int             clone(void*, void*);
 int             join(void**);
 
 // swtch.S

@@ -25,20 +25,17 @@ void tinit(struct lock_t *locked) {
  */
 int thread_create(void*(*start) (void*), void *arg) {
   // allocate the stack frame with malloc
-  void *stack = malloc(PGSIZE/2);
+  void *stack = malloc(PGSIZE);
   // clone the process using our new stack
   // as the address space for the thread
   // clone is function start, args, stack
-  int thread = clone(start, arg, stack);
-
-   printf(2, "Starting thread: %d\n", thread);
+  int thread = clone(arg, stack);
 
   // make sure we properly cloned
   // process before we start execution
   if(!thread) {
     // execute starting here!
     (*start)(arg);
-    //printf(2, "Done executing\n");
   }
   return thread;
 }

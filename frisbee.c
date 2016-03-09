@@ -10,19 +10,18 @@
 
 typedef struct __args {
   int *throws;
-  int *counter;
   struct lock_t *lock;
 } thread_args;
 
-void frisbee(void *args){
+void *frisbee(void *args){
   thread_args *arg = (thread_args*)args;
 
   for(int x=0; x<*arg->throws;x++){
     lock_acquire(arg->lock);
-    (*arg->counter) += 1;
     printf(2, "Fly, my loving morning dove!\n");
     lock_release(arg->lock);
   }
+  return 0;
 }
 
   int
@@ -49,18 +48,14 @@ main(int argc, char *argv[])
 
   args.throws = &throws;
   args.lock = &lock;
-  args.counter = 0;
 
   for(int x = 0;x < threads; x++) {
-    pid = thread_create((void *) &frisbee, (void *) &args);
+    pid = thread_create(frisbee, (void *) &args);
+    printf(2, "Starting thread: %d\n", pid);
   }
 
   for(int x = 0; x < threads; x++) {
     thread_join();
-  }
-
-  if(pid > 0) {
-
   }
 
   printf(1, "joined\n");

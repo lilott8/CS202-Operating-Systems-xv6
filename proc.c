@@ -20,7 +20,7 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-void
+  void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
@@ -31,7 +31,7 @@ pinit(void)
 // If found, change state to EMBRYO and initialize
 // state required to run in the kernel.
 // Otherwise return 0.
-static struct proc*
+  static struct proc*
 allocproc(void)
 {
   struct proc *p;
@@ -55,11 +55,11 @@ found:
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
-  
+
   // Leave room for trap frame.
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
-  
+
   // Set up new context to start executing at forkret,
   // which returns to trapret.
   sp -= 4;
@@ -75,12 +75,12 @@ found:
 
 //PAGEBREAK: 32
 // Set up first user process.
-void
+  void
 userinit(void)
 {
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
-  
+
   p = allocproc();
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
@@ -104,11 +104,11 @@ userinit(void)
 
 // Grow current process's memory by n bytes.
 // Return 0 on success, -1 on failure.
-int
+  int
 growproc(int n)
 {
   uint sz;
-  
+
   sz = proc->sz;
   if(n > 0){
     if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
@@ -122,16 +122,16 @@ growproc(int n)
   // we must ensure that threads can request growth
   // as well, otherwise things break, and xv6 starts
   // on fire
-  struct proc *p;
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    // only allow growth for threads
-    if(p->parent != proc || p->thread == 1) {
-      p->sz = sz;
-    }
+  /*struct proc *p;
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+  // only allow growth for threads
+  if(p->parent != proc || p->thread == 1) {
+  p->sz = sz;
+  }
   }
   release(&ptable.lock); 
-  
+   */
   switchuvm(proc);
   return 0;
 }
@@ -243,7 +243,7 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       // lab3
       if(p->parent != proc)
-        //continue;
+        continue;
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
@@ -252,7 +252,7 @@ wait(void)
         p->kstack = 0;
         // lab3
         // only free the vm if the process is done
-        if(p->thread != 1) {
+        if(p->thread == 0) {
           freevm(p->pgdir);
         }
         p->state = UNUSED;
@@ -489,7 +489,7 @@ procdump(void)
   }
 }
 
-int clone(void*(*start)(void*), void* args, void* stack) {
+int clone(void* args, void* stack) {
 
   int i, pid;
   struct proc *np;
@@ -513,27 +513,13 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   *np->tf = *proc->tf;
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
-  // set the args on the stack to the args we want
-  //*(uint*)(stack_top - 4) = (int) args;
-  // we don't care what the return address is
-  //*(uint*)(stack_top - 8) = 0;
-  // register values are different for the new clone
-  // so we need to ensure that each register is 
-  // pointing to the correct value otherwise it dies
-  //np->tf->esp = (int) (stack_top - 8);
-  // now point the EIP to the starting function
-  //np->tf->eip = (int) start;
 
-  void *startloc = (void *)proc->tf->ebp + 16;  // 16 moves it up 16 bytes (4 locations)
-  void *endloc = (void *)proc->tf->esp;
-  uint stacksize = (uint) (startloc - endloc);
+  uint stack_size = (uint)(((void *) proc->tf->ebp + 16) - ((void *)proc->tf->esp));
 
-  np->tf->esp = (uint)(stack - stacksize);
+  np->tf->esp = (uint)(stack - stack_size);
   np->tf->ebp = (uint)(stack - 16);
 
-  memmove(stack - stacksize, endloc, stacksize);
-
-
+  memmove(stack - stack_size, (void *)proc->tf->esp, stack_size);
 
   // denote this as a thread
   np->thread = 1;
