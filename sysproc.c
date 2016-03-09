@@ -112,7 +112,6 @@ int sys_clone(void) {
   }
 
   return clone(start, args, stack);
-
 }
 
 int sys_join(void) {

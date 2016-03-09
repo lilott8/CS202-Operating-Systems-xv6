@@ -23,12 +23,13 @@ void tinit(struct tinfo *locked) {
  * size of "size" (typically not more than the
  * defined PGSIZE system variable
  */
-void thread_create(void *(*start) (void*), void *arg) {
+void thread_create(void*(*start) (void*), void *arg) {
   // allocate the stack frame with malloc
   void *stack = malloc(PGSIZE);
   // clone the process using our new stack
   // as the address space for the thread
-  int thread = clone(stack, PGSIZE);
+  // clone is function start, args, stack
+  int thread = clone(start, arg, stack);
 
   printf(2, "starting thread: %d\n", thread);
 

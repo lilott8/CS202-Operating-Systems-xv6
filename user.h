@@ -24,7 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 // lab3
-int clone(void(*start)(void*), void * args, void * stack);
+int clone(void*(*start)(void*), void * args, void * stack);
 int join(void ** stack);
 
 // ulib.c

@@ -465,41 +465,44 @@ procdump(void)
   }
 }
 
-int clone(void(*start)(void*), void* args, void* stack) {
+int clone(void*(*start)(void*), void* args, void* stack) {
   
   int i, pid;
   struct proc *np;
   int * ustack = stack + PGSIZE - 4;  
-  //cprintf("ustack %p\n", ustack);
 
-  // Allocate process. KEEP THIS, gives kernel stack
+  // Allocate process or die trying!
   if((np = allocproc()) == 0)
     return -1;
 
+  // copy the page directory so that the cloned thread
+  // has access to the same shared memory as the
+  // parent thread
   np->pgdir = proc->pgdir;
   np->sz = proc->sz;
   //np->pthread = proc;
   //np->ustack = stack;
   // not sure about this
   np->parent = 0;
-  *np->tf = *proc->tf; // Change new child's tf
-
-  // Clone may need to change other registers than ones seen in fork
-  // New threads have new pids or thread ids
-  //
+  // point the trap frame of the child
+  // to that of the parent
+  *np->tf = *proc->tf;
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = np->pid;
+  // register values are different for the new clone
+  // so we need to ensure that each register is 
+  // pointing to the correct value otherwise it dies
   np->tf->ebp = (int) ustack - 4;
   np->tf->esp = (int) ustack - 4;
   np->tf->eip = (int) start; 
-  // setup new user stack and some pointers
-  // np->tf->eip np->tf->eip
+  // set the args on the stack to the args we want
   *ustack = (int) args; // 7
-  //*(ustack - 1) = (int) (arg + 4); // 3
-  //*(ustack - 2) = (int) arg; // 5
-  *(ustack - 1) = 0xffffffff; // bs return addr
-  *(ustack - 2) = 0xffffffff; // bs ebp
-
+  // we don't care what the return address is
+  *(ustack - 1) = 0xffffffff;
+  // we don't care what the ebp is
+  *(ustack - 2) = 0xffffffff;
+  
+  // copy the file descriptors
   for(i = 0; i < NOFILE; i++) {
     if(proc->ofile[i]) {
       np->ofile[i] = filedup(proc->ofile[i]);
@@ -508,6 +511,7 @@ int clone(void(*start)(void*), void* args, void* stack) {
   np->cwd = idup(proc->cwd);
 
   pid = np->pid;
+  
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
 
