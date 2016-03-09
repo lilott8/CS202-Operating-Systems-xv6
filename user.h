@@ -1,5 +1,7 @@
 struct stat;
 struct rtcdate;
+// lab3
+struct tinfo;
 
 // system calls
 int fork(void);
@@ -40,3 +42,11 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+
+// lab3
+void tinit(struct tinfo *lock);
+int thread_create(void*(*start)(void*), void *arg);
+void thread_join();
+void init_lock(struct tinfo *lock);
+void lock_acquire(struct tinfo *lock);
+void lock_release(struct tinfo *lock);

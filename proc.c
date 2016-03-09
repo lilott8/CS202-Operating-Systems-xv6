@@ -516,7 +516,7 @@ int clone(void*(*start)(void*), void* args, void* stack) {
   // set the args on the stack to the args we want
   *(uint*)(stack_top - 4) = (int) args;
   // we don't care what the return address is
-  *(uint*)(stack_top - 8) = 0xffffffff;
+  *(uint*)(stack_top - 8) = 0;
   // register values are different for the new clone
   // so we need to ensure that each register is 
   // pointing to the correct value otherwise it dies
@@ -526,9 +526,6 @@ int clone(void*(*start)(void*), void* args, void* stack) {
 
   // denote this as a thread
   np->thread = 1;
-
-  // finally set the stack to the thread
-  // np->stack = stack;
 
   // copy the file descriptors
   for(i = 0; i < NOFILE; i++) {
@@ -547,5 +544,5 @@ int clone(void*(*start)(void*), void* args, void* stack) {
 }
 
 int join(void** stack) {
-  return 1;
+  return wait();
 }

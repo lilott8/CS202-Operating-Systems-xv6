@@ -5,28 +5,54 @@
 #include "fcntl.h"
 #include "syscall.h"
 #include "traps.h"
+#include "thread.h"
+#include "mmu.h"
 
+typedef struct __args {
+  int *throws;
+  int *counter;
+  struct tinfo *lock;
+} thread_args;
 
-void frisbee(char * five){
-  printf(1, "printing: %s\n", *five);
-  exit();
+void frisbee(void * five){
+  printf(1, "I'm here!!!\n");
 }
 
   int
 main(int argc, char *argv[])
 {
+
   int pid;
-  char * arg = "five";
-  void ** stack = malloc(4096);
-  //void ** stack2 = malloc(4096);
+  int threads = 0;
+  int throws = 0;
+  thread_args args;
 
-  printf(1, "testing...\n");
-  // printf(1, "user printf stack %p, stack2 %p\n", stack, stack2);
+  if(argc != 3) {
+    throws = 4;
+    threads = 4;
+  } else {
+    throws = atoi(argv[2]);
+    threads = atoi(argv[1]);
+  }
 
-  pid = clone((void *) &frisbee, (void *) &arg, (void *) *stack);
-  printf(1, "user pid: %d\n", pid);
+  printf(2, "Using %d throws with %d threads\n", throws, threads);
 
-  //printf(1, "jpid %d\n", join((void **) stack));
+  struct tinfo lock;
+  init_lock(&lock);
+
+  args.throws = &throws;
+  args.lock = &lock;
+  args.counter = 0;
+
+  for(int x = 0;x < threads; x++) {
+    pid = thread_create((void *) &frisbee, (void *) &args);
+  }
+
+  thread_join();
+
+  if(throws >0 || pid > 0) {
+
+  }
 
   printf(1, "joined\n");
   exit();
