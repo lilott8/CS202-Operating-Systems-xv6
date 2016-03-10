@@ -69,7 +69,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   // lab3
-  bool thread;
+  bool thread;                 // This denotes a thread if 1 and process if 0
 };
 
 // Process memory is laid out contiguously, low addresses first:

@@ -27,7 +27,6 @@ void *frisbee(void *args){
   int
 main(int argc, char *argv[])
 {
-
   int pid;
   int threads = 0;
   int throws = 0;
@@ -50,7 +49,7 @@ main(int argc, char *argv[])
   args.lock = &lock;
 
   for(int x = 0;x < threads; x++) {
-    pid = thread_create(frisbee, (void *) &args);
+    pid = thread_create(frisbee, (void*) &args);
     printf(2, "Starting thread: %d\n", pid);
   }
 
@@ -58,6 +57,6 @@ main(int argc, char *argv[])
     thread_join();
   }
 
-  printf(1, "joined\n");
+  printf(1, "done\n");
   exit();
 }
