@@ -16,7 +16,9 @@ typedef struct __args {
 void *frisbee(void *args){
   thread_args *arg = (thread_args*)args;
 
-  for(int x=0; x<*arg->throws;x++){
+  int x = 0;
+
+  for(x=0; x<*arg->throws;x++){
     lock_acquire(arg->lock);
     printf(2, "Fly, my loving morning dove!\n");
     lock_release(arg->lock);
@@ -48,12 +50,14 @@ main(int argc, char *argv[])
   args.throws = &throws;
   args.lock = &lock;
 
-  for(int x = 0;x < threads; x++) {
+  int x = 0;
+
+  for(x = 0;x < threads; x++) {
     pid = thread_create(frisbee, (void*) &args);
     printf(2, "Starting thread: %d\n", pid);
   }
 
-  for(int x = 0; x < threads; x++) {
+  for(x = 0; x < threads; x++) {
     thread_join();
   }
 
