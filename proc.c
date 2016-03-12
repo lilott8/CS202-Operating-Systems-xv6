@@ -60,6 +60,9 @@ found:
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
 
+  // lab3
+  p->thread = 0;
+
   // Set up new context to start executing at forkret,
   // which returns to trapret.
   sp -= 4;
@@ -99,6 +102,9 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
+  // lab3
+  p->thread = 0;
+
   p->state = RUNNABLE;
 }
 
@@ -122,16 +128,16 @@ growproc(int n)
   // we must ensure that threads can request growth
   // as well, otherwise things break, and xv6 starts
   // on fire
-  /*struct proc *p;
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-  // only allow growth for threads
-  if(p->parent != proc || p->thread == 1) {
-  p->sz = sz;
-  }
+  struct proc *p;
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    // only allow growth for threads
+    if(p->parent != proc || p->thread == 1) {
+      p->sz = sz;
+    }
   }
   release(&ptable.lock); 
-   */
+
   switchuvm(proc);
   return 0;
 }
