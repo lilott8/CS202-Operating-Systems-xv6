@@ -60,9 +60,6 @@ found:
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
 
-  // lab3
-  p->thread = 0;
-
   // Set up new context to start executing at forkret,
   // which returns to trapret.
   sp -= 4;
@@ -102,9 +99,6 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
-  // lab3
-  p->thread = 0;
-
   p->state = RUNNABLE;
 }
 
@@ -128,16 +122,16 @@ growproc(int n)
   // we must ensure that threads can request growth
   // as well, otherwise things break, and xv6 starts
   // on fire
-  struct proc *p;
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    // only allow growth for threads
-    if(p->parent != proc || p->thread == 1) {
-      p->sz = sz;
-    }
+  /*struct proc *p;
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+  // only allow growth for threads
+  if(p->parent != proc || p->thread == 1) {
+  p->sz = sz;
+  }
   }
   release(&ptable.lock); 
-
+   */
   switchuvm(proc);
   return 0;
 }
@@ -248,7 +242,7 @@ wait(void)
     havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       // lab3
-      if(p->parent != proc || p->thread != 1)
+      if(p->parent != proc)
         continue;
       havekids = 1;
       if(p->state == ZOMBIE){
@@ -520,39 +514,11 @@ int clone(void* args, void* stack) {
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
-  /**
-   * This calculates the size of the stack.  We take the difference
-   * between the args all the way to the esp.  The stack fram looks
-   * as follows:
-   *        +------------+   |
-   *        | arg 2      |   \
-   *        +------------+    >- previous function's stack frame
-   *        | arg 1      |   /
-   *        +------------+   |
-   *        | ret %eip   |   /
-   *        +============+   
-   *        | saved %ebp |   \
-   * %ebp-> +------------+   |
-   *        |            |   |
-   *        |   local    |   \
-   *        | variables, |    >- current function's stack frame
-   *        |    etc.    |   /
-   *        |            |   |
-   *        |            |   |
-   * %esp-> +------------+   /
-   *
-   * Because of the stack grows down, we want to add from the ebp
-   * in order to include the args, and eip.  This guarantees that
-   * the entire stack frame is preserved.
-   */
   uint stack_size = (uint)(((void *) proc->tf->ebp + 16) - ((void *)proc->tf->esp));
 
-  // provide the esp/ebp for the new thread
   np->tf->esp = (uint)(stack - stack_size);
   np->tf->ebp = (uint)(stack - 16);
 
-  // Move the esp from the parent to the address of stack-stack_size
-  // with the size of stack_size
   memmove(stack - stack_size, (void *)proc->tf->esp, stack_size);
 
   // denote this as a thread

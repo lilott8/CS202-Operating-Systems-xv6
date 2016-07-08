@@ -1,4 +1,3 @@
-#include "param.h"
 /**
  * lab3
  */

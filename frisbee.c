@@ -6,24 +6,19 @@
 #include "syscall.h"
 #include "traps.h"
 #include "thread.h"
-#include "param.h"
 #include "mmu.h"
 
 typedef struct __args {
   int *throws;
-  int *thread_num;
   struct lock_t *lock;
 } thread_args;
 
 void *frisbee(void *args){
   thread_args *arg = (thread_args*)args;
-
-  int x = 0;
-
+  int x;
   for(x=0; x<*arg->throws;x++){
     lock_acquire(arg->lock);
-    printf(2, "Fly, my loving morning dove! %d throws\n", getpid());
-    printf(2, "Thread Number: %d\n", arg->thread_num);
+    printf(2, "Thread %d throws the Frisbee! \n",getpid());
     lock_release(arg->lock);
   }
   return 0;
@@ -52,19 +47,17 @@ main(int argc, char *argv[])
 
   args.throws = &throws;
   args.lock = &lock;
-
-  int x = 0;
-
-  for(x = 0;x < threads; x++) {
-    args.thread_num = &x;
+  int x;
+  for( x = 0;x < threads; x++) {
     pid = thread_create(frisbee, (void*) &args);
-    printf(2, "Starting thread: %d\n", pid);
+    if(pid)
+      printf(2, "Starting thread: %d\n", pid);
   }
 
   for(x = 0; x < threads; x++) {
     thread_join();
   }
 
-  printf(1, "done\n");
+  // printf(1, "done\n");
   exit();
 }
